@@ -1,13 +1,13 @@
 {
-  "name": "F3F Manager v6.3",
-  "short_name": "F3F Manager",
-  "description": "Optimisation Ballast et CG pour planeurs F3F",
+  "name": "F3F Manager Stable",
+  "short_name": "F3F Pro",
+  "description": "Version statique pour APK - Fiabilité maximale",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0a",
-  "theme_color": "#0d6efd",
+  "theme_color": "#0a0a0a",
   "icons": [
     {
       "src": "icon.png",
