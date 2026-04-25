@@ -375,14 +375,15 @@
 
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log("Système local opérationnel"));
+    navigator.serviceWorker.register('./sw.js');
   }
 
-  // Empêcher les gestes de navigation du navigateur qui pourraient faire quitter l'app
-  document.addEventListener('touchmove', function (e) {
-    if (e.scale !== 1) { e.preventDefault(); }
-  }, { passive: false });
+  // Pour bloquer le zoom proprement sans casser le scroll :
+  // On utilise les méta-tags du head (déjà présents normalement)
+  // Et on peut ajouter ceci pour bloquer le zoom involontaire sur iOS
+  document.addEventListener('gesturestart', function(e) {
+    e.preventDefault();
+  });
 </script>
 
 </body>
