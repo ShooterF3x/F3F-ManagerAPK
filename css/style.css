@@ -61,7 +61,13 @@
 }
 
 /* --- LAYOUT --- */
-html { height: 100%; }
+/* --- RÉINITIALISATION PRIORITAIRE --- */
+html {
+    height: auto;              /* Annule le 100% qui bloque tout */
+    min-height: 100%;
+    background: var(--bg);
+}
+
 body {
     font-family: var(--font-body);
     background: var(--bg);
@@ -69,20 +75,31 @@ body {
     margin: 0;
     padding: 15px;
     padding-top: calc(15px + env(safe-area-inset-top));
-    padding-bottom: 80px;
+    padding-bottom: 100px;     /* Plus de place en bas pour le confort */
     
-    /* --- LES CORRECTIONS ICI --- */
-    overflow-y: auto;          /* Autorise le scroll vertical */
-    overflow-x: hidden;        /* Empêche le scroll horizontal parasite */
-    min-height: 100vh;         /* S'assure que le body fait au moins la taille de l'écran */
-    -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
+    /* On force le scroll ici */
+    display: block;            
+    position: relative;
+    overflow-y: auto !important; 
+    overflow-x: hidden;
+    min-height: 100vh;
     
-    /* On remplace "none" par "contain" pour autoriser le scroll mais bloquer le rafraîchissement haut */
-    overscroll-behavior-y: contain; 
+    /* Fluidité mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto; /* Laisse le navigateur gérer le rebond naturellement */
     
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
+
+/* S'assurer que les "vues" ne bloquent pas le flux */
+#view-home, #view-calc, #view-edit, #view-help, #view-settings, #view-logbook {
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    display: block; /* Devient none via la classe .hidden */
+}
+
 .hidden { display: none !important; }
 .row { display: flex; gap: 10px; } 
 
