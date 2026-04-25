@@ -375,12 +375,14 @@
 
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker enregistré !'))
-        .catch(err => console.log('Erreur Service Worker :', err));
-    });
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log("Système local opérationnel"));
   }
+
+  // Empêcher les gestes de navigation du navigateur qui pourraient faire quitter l'app
+  document.addEventListener('touchmove', function (e) {
+    if (e.scale !== 1) { e.preventDefault(); }
+  }, { passive: false });
 </script>
 
 </body>
