@@ -62,7 +62,27 @@
 
 /* --- LAYOUT --- */
 html { height: 100%; }
-body { font-family: var(--font-body); background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: 80px; user-select: none; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; transition: background 0.3s, color 0.3s; }
+body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 15px;
+    padding-top: calc(15px + env(safe-area-inset-top));
+    padding-bottom: 80px;
+    
+    /* --- LES CORRECTIONS ICI --- */
+    overflow-y: auto;          /* Autorise le scroll vertical */
+    overflow-x: hidden;        /* Empêche le scroll horizontal parasite */
+    min-height: 100vh;         /* S'assure que le body fait au moins la taille de l'écran */
+    -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
+    
+    /* On remplace "none" par "contain" pour autoriser le scroll mais bloquer le rafraîchissement haut */
+    overscroll-behavior-y: contain; 
+    
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
 .hidden { display: none !important; }
 .row { display: flex; gap: 10px; } 
 
