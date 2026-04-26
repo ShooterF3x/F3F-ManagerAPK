@@ -33,7 +33,7 @@ const dict = {
         msg_import_success: "Importation réussie !", msg_import_err: "Erreur lors de l'import.",
         msg_replace_all: "Attention : Ceci va REMPLACER tous vos modèles et logs actuels. Continuer ?",
         msg_add_model: "Modèle détecté : ", msg_add_model_q: "Voulez-vous l'ajouter à votre liste ?",
-        help_html: `<h3>F3F Manager V6.3</h3><p>Optimisation intelligente, Croquis Dynamique et Ingénieur embarqué.</p>`
+        help_html: `<h3>F3F Manager V6.4</h3><p>Optimisation intelligente, Croquis Dynamique et Ingénieur embarqué.</p>`
     },
     en: {
         new_model: "+ NEW MODEL", logbook_btn: "📓 LOGBOOK", back: "BACK", config: "CONFIG",
@@ -64,12 +64,12 @@ const dict = {
         msg_import_success: "Import successful!", msg_import_err: "Error during import.",
         msg_replace_all: "Warning: This will REPLACE all your current models and logs. Continue?",
         msg_add_model: "Model detected: ", msg_add_model_q: "Add it to your list?",
-        help_html: `<h3>F3F Manager V6.3</h3><p>Smart optimization, Dynamic Sketch and Embedded Track Engineer.</p>`
+        help_html: `<h3>F3F Manager V6.4</h3><p>Smart optimization, Dynamic Sketch and Embedded Track Engineer.</p>`
     }
 };
 
 /* --- VARIABLES D'ÉTAT GLOBALES --- */
-let gliders = [], flightLogs = [], globalCoefs = {}, optParams = {};
+let gliders = [], flightLogs = [], globalCoefs = {}, optParams = {}, savedSlopes = [];
 let currentGliderId = null, tempGlider = null;
 let settingsChartInstance = null;
 
@@ -100,17 +100,18 @@ function save() {
     localStorage.setItem('f3f_logs', JSON.stringify(flightLogs)); 
     localStorage.setItem('f3f_global_coefs', JSON.stringify(globalCoefs)); 
     localStorage.setItem('f3f_opt_params', JSON.stringify(optParams)); 
+    localStorage.setItem('f3f_slopes', JSON.stringify(savedSlopes)); 
 }
 
 /* --- IMPORT / EXPORT JSON --- */
 window.exportData = function(type) {
     let exportObj = {}, fileName = "f3f_backup.json";
     if(type === 'all') {
-        exportObj = { type: 'backup_full', version: '6.3', date: new Date().toISOString(), gliders: gliders, logs: flightLogs, coefs: globalCoefs, opts: optParams };
+        exportObj = { type: 'backup_full', version: '6.4', date: new Date().toISOString(), gliders: gliders, logs: flightLogs, coefs: globalCoefs, opts: optParams, slopes: savedSlopes };
         fileName = `f3f_full_backup_${new Date().toISOString().slice(0,10)}.json`;
     } else if (type === 'model') {
         if(!tempGlider) return;
-        exportObj = { type: 'backup_model', version: '6.3', data: tempGlider };
+        exportObj = { type: 'backup_model', version: '6.4', data: tempGlider };
         fileName = `${tempGlider.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
     }
     
@@ -124,29 +125,17 @@ window.exportData = function(type) {
     document.body.appendChild(a); 
     a.click(); 
     
-    setTimeout(() => {
-        document.body.removeChild(a); 
-        URL.revokeObjectURL(url);
-    }, 200);
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
 };
 
-window.triggerImport = function() { 
-    document.getElementById('import-file').click(); 
-};
+window.triggerImport = function() { document.getElementById('import-file').click(); };
 
 window.handleFile = function(input) {
-    const file = input.files[0]; 
-    if(!file) return;
-    
+    const file = input.files[0]; if(!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-        try {
-            const json = JSON.parse(e.target.result);
-            processImport(json);
-        } catch(err) { 
-            window.customAlert(t('msg_import_err')); 
-            console.error(err); 
-        }
+        try { const json = JSON.parse(e.target.result); processImport(json); } 
+        catch(err) { window.customAlert(t('msg_import_err')); console.error(err); }
         input.value = ''; 
     };
     reader.readAsText(file);
@@ -156,7 +145,7 @@ function processImport(data) {
     if(!data.type) { window.customAlert(t('msg_import_err')); return; }
     if(data.type === 'backup_full') {
         window.showModal(t('msg_replace_all'), false, [{tx:t('cancel'), cl:'btn-outline', val:0}, {tx:t('yes'), cl:'btn-danger', val:1}], (r) => {
-            if(r) { gliders = data.gliders || []; flightLogs = data.logs || []; globalCoefs = data.coefs || globalCoefs; optParams = data.opts || optParams; save(); window.location.reload(); }
+            if(r) { gliders = data.gliders || []; flightLogs = data.logs || []; globalCoefs = data.coefs || globalCoefs; optParams = data.opts || optParams; savedSlopes = data.slopes || []; save(); window.location.reload(); }
         });
     } else if (data.type === 'backup_model') {
         let m = data.data;
