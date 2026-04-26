@@ -7,7 +7,7 @@ async function checkForUpdates() {
         const response = await fetch(`https://raw.githubusercontent.com/TON_USER/TON_REPO/main/version.json?t=${Date.now()}`, { cache: "no-store" });
         if (!response.ok) return;
         const data = await response.json();
-        if (data.version && data.version !== "6.3") {
+        if (data.version && data.version !== "6.4") {
             window.showModal(
                 `Une mise à jour (V${data.version}) est disponible !`, false,
                 [{tx: "Ignorer", cl: "btn-outline", val: 0}, {tx: "Voir GitHub", cl: "btn-primary", val: 1}],
