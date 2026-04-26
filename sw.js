@@ -1,4 +1,4 @@
-const CACHE_NAME = 'f3f-snapshot-v1'; // On ne change JAMAIS ce nom
+const CACHE_NAME = 'f3f-manager-static-v1';
 const ASSETS = [
   './',
   './index.html',
@@ -9,14 +9,12 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  // On a supprimé skipWaiting() ici pour ne pas forcer la mise à jour
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
 self.addEventListener('activate', e => {
-  // On garde le nettoyage de sécurité
   e.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
@@ -26,9 +24,14 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // On ne met pas en cache les requêtes vers l'extérieur (API Gemini, GitHub, etc.)
+  if (!e.request.url.startsWith(self.location.origin)) {
+    return; // Laisse le navigateur gérer les requêtes externes normalement
+  }
+
   e.respondWith(
     caches.match(e.request).then(response => {
-      // CACHE FIRST : Si c'est dans le téléphone, on ne demande rien à internet.
+      // Stratégie "Cache First" pour nos assets statiques
       return response || fetch(e.request);
     })
   );
