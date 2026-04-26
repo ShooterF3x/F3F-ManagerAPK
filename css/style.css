@@ -62,33 +62,38 @@
 /* (Les autres thèmes plat / bunker sont conservés à l'identique dans cette logique) */
 
 /* --- LAYOUT --- */
-html {
+html, body {
+  /* On laisse le navigateur gérer le défilement naturellement */
   height: auto;
-  min-height: 100%;
+  min-height: 100vh;
+  overflow-x: hidden; /* Coupe uniquement les débordements horizontaux */
   background: var(--bg);
 }
 
 body {
   font-family: var(--font-body);
-  background: var(--bg);
   color: var(--text);
   margin: 0;
   padding: 15px;
   padding-top: calc(15px + env(safe-area-inset-top));
   padding-bottom: 100px;
-  display: block;            
+  
+  /* Retrait de overflow-y: auto qui bloquait le tactile */
   position: relative;
-  overflow-y: auto !important; 
-  overflow-x: hidden;
-  min-height: 100vh;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: auto; 
+  
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Sécurité supplémentaire : on s'assure que les vues ne dépassent pas de l'écran */
+#view-home, #view-calc, #view-edit, #view-help, #view-settings, #view-logbook {
+  width: 100%;
+  box-sizing: border-box; /* Empêche le padding de faire déborder la div */
+  display: block;
+}
+
 .hidden { display: none !important; }
-.row { display: flex; gap: 10px; } 
+.row { display: flex; gap: 10px; }
 
 /* --- UTILS & BOUTONS --- */
 /* (Je t'invite à conserver tes classes de boutons, formulaires et cards exactement comme elles sont structurées ici. La base CSS était saine !) */
