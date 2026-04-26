@@ -89,7 +89,7 @@ function initApp() {
     if(window.showView) window.showView('home');
 
     // 6. Vérification de version sur le github après 1.5 secondes
-    setTimeout(() => { if(window.checkForUpdates) checkForUpdates(); }, 1500);
+    //setTimeout(() => { if(window.checkForUpdates) checkForUpdates(); }, 1500);
 }
 
 // Lancement au chargement de la page
