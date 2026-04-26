@@ -245,6 +245,59 @@ function renderCalc() {
     recalc(g);
 }
 
+function recalc(g) {
+    if(!g) return;
+    const activeOpts = getActiveOpts(g);
+
+    let nMass = g.noseMass || 0; let nDist = g.noseDist || 0;
+    let m = g.emptyW + nMass; let mom = (g.emptyW * g.emptyCG) + (nMass * (-nDist));
+    let addedMass = nMass; 
+    
+    g.chambers.forEach((c,i) => {
+        const L = g.loadout[i];
+        let mass = L.b*(c.mass_brass||0) + L.l*(c.mass_lead||0) + L.t*(c.mass_tungsten||0);
+        m += mass; mom += mass * c.dist; addedMass += mass;
+    });
+    let cg = m > 0 ? mom/m : 0;
+    
+    const wEl = document.getElementById('res-weight');
+    if(wEl) wEl.innerText = (m/1000).toFixed(3);
+    
+    const wVal = parseFloat(document.getElementById('inp-wind').value) || 0;
+    const fVal = parseFloat(document.getElementById('inp-factor').value) || 100;
+    let target = getCalculatedTargetWeight(wVal, fVal, g); 
+    let weightDiff = m - target;
+    if(wEl) wEl.style.color = (weightDiff >= -activeOpts.wMin && weightDiff <= activeOpts.wMax) ? 'var(--success)' : 'var(--warning)';
+
+    const resCgEl = document.getElementById('res-cg');
+    if(resCgEl) resCgEl.innerText = cg.toFixed(1);
+    
+    const diff = cg - g.sessionTargetCG;
+    const dEl = document.getElementById('cg-diff-display'); 
+    if(dEl) {
+        dEl.innerText = (diff*-1 > 0 ? '+' : '') + (diff*-1).toFixed(1) + 'mm';
+        let isCgGood = (diff >= 0) ? (diff <= activeOpts.cgTolPlus) : (Math.abs(diff) <= activeOpts.cgTolMinus);
+        dEl.style.color = isCgGood ? 'var(--success)' : 'var(--danger)';
+        if(resCgEl) resCgEl.style.color = isCgGood ? 'var(--success)' : 'var(--danger)';
+    }
+    
+    const barEl = document.getElementById('bar-weight');
+    if (barEl && barEl.parentNode) { barEl.parentNode.style.display = 'none'; }
+    const loadEl = document.getElementById('res-loading');
+    if(loadEl && g.area > 0) {
+        let load = m/g.area;
+        loadEl.innerText = `${load.toFixed(1)} g/dm² (+${addedMass}g)`;
+        if(load > 75) { loadEl.style.color = 'var(--danger)'; loadEl.style.fontWeight = '900'; loadEl.style.fontSize = '0.9rem'; } else { loadEl.style.color = 'var(--text-muted)'; loadEl.style.fontWeight = 'normal'; loadEl.style.fontSize = '0.75rem'; }
+    }
+    
+    const tgtDisp = document.getElementById('res-target-cg-disp');
+    if(tgtDisp) tgtDisp.innerText = t('cible_short') + " " + g.sessionTargetCG + "mm";
+    const cardTgt = document.getElementById('card-target-cg-disp');
+    if (cardTgt) cardTgt.innerText = g.sessionTargetCG + "mm";
+    const simTgt = document.getElementById('res-sim-target');
+    if(simTgt) simTgt.innerText = (target/1000).toFixed(3);
+}
+
 window.updMix = function(e, idx, type, delta) {
     if(e) e.stopPropagation(); 
     const g = gliders.find(x=>x.id==currentGliderId); const L = g.loadout[idx]; const c = g.chambers[idx];
@@ -298,23 +351,67 @@ window.setAerology = function(val) {
     save(); recalc(g);
 };
 
+/* --- GESTION DES PENTES (DROPDOWN) --- */
+window.renderSlopeDropdown = function() {
+    const sel = document.getElementById('inp-slope');
+    if(!sel) return;
+    
+    const historySlopes = flightLogs.map(l => l.s).filter(s => s);
+    const allSlopes = [...new Set([...savedSlopes, ...historySlopes])].sort();
+    const currentValue = sel.value; 
+    
+    sel.innerHTML = `<option value="">-- Choisir une Pente --</option>`;
+    allSlopes.forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+    sel.innerHTML += `<option value="__NEW__">➕ Ajouter une pente...</option>`;
+    
+    if (allSlopes.includes(currentValue)) { sel.value = currentValue; }
+};
+
+window.handleSlopeChange = function(sel) {
+    if (sel.value === '__NEW__') {
+        window.showModal("Nom de la nouvelle pente :", true, [
+            {tx: "Annuler", cl: "btn-outline", val: null},
+            {tx: "Ajouter", cl: "btn-primary", val: "inp"}
+        ], (newSlope) => {
+            if (newSlope && newSlope.trim() !== "") {
+                const cleanSlope = newSlope.toUpperCase().trim();
+                if (!savedSlopes.includes(cleanSlope)) { savedSlopes.push(cleanSlope); save(); }
+                window.renderSlopeDropdown(); document.getElementById('inp-slope').value = cleanSlope;
+            } else {
+                window.renderSlopeDropdown(); sel.value = "";
+            }
+        });
+    }
+};
+
 window.suggestFromHistory = function() {
     const g = gliders.find(x => x.id == currentGliderId); if (!g || flightLogs.length === 0) return;
     const currentWind = parseFloat(document.getElementById('inp-wind').value) || 0;
-    const currentSlope = document.getElementById('inp-slope').value.toUpperCase().trim();
-    let similarLogs = flightLogs.filter(l => l.m === g.name && l.t);
-    if (currentSlope) { const slopeLogs = similarLogs.filter(l => l.s === currentSlope); if(slopeLogs.length > 0) similarLogs = slopeLogs; }
+    const currentSlope = document.getElementById('inp-slope').value;
+
+    if (!currentSlope || currentSlope === "" || currentSlope === "__NEW__") {
+        window.customAlert("💡 Veuillez d'abord sélectionner une pente pour avoir une suggestion précise.");
+        return;
+    }
+
+    let similarLogs = flightLogs.filter(l => l.m === g.name && l.t && l.s === currentSlope);
     similarLogs = similarLogs.filter(l => Math.abs(parseFloat(l.wind || 0) - currentWind) <= 2);
-    if (similarLogs.length === 0) { window.customAlert("Pas de chronos dans le journal pour ces conditions."); return; }
+    
+    if (similarLogs.length === 0) { 
+        window.customAlert(`Pas de chronos dans le journal pour le ${g.name} à ${currentSlope} avec un vent similaire (±2 m/s).`); 
+        return; 
+    }
+    
     const best = similarLogs.sort((a, b) => parseFloat(a.t) - parseFloat(b.t))[0];
     const box = document.getElementById('ai-suggestion-box'); box.classList.remove('hidden');
     document.getElementById('ai-suggestion-text').innerHTML = `
-        <strong>💡 Meilleur chrono : ${best.t}s</strong> ${currentSlope ? `à ${currentSlope}` : ''}<br>
+        <strong>💡 Meilleur chrono à ${currentSlope} : ${best.t}s</strong><br>
         Par ${best.wind}m/s, tu avais un CG réglé à <b style="color:var(--primary); cursor:pointer; font-size:1.1rem; text-decoration:underline;" onclick="window.syncInputs('cg-target', ${best.cg})">${best.cg}mm</b> (Poids: ${best.w}).<br>
         <span style="font-size:0.75rem; color:var(--text-muted);">(Clique sur le chiffre du CG pour l'appliquer au curseur)</span>
     `;
 };
 
+/* --- LOGS --- */
 function updateLogFilters() {
     const mSel = document.getElementById('filter-model'), sSel = document.getElementById('filter-slope');
     const currM = mSel.value; const currS = sSel.value;
@@ -350,6 +447,12 @@ window.toggleAllLogs = function(isChecked) { document.querySelectorAll('.log-chk
 window.showLogbook = function() { updateLogFilters(); window.renderLogs(); };
 
 window.openSaveLogModal = function() { 
+    const slopeVal = document.getElementById('inp-slope').value;
+    if (!slopeVal || slopeVal === "" || slopeVal === "__NEW__") {
+        window.customAlert("Veuillez sélectionner une pente avant d'enregistrer le vol.");
+        return;
+    }
+
     const finalTime = document.getElementById('log-time').value;
     const airCondObj = document.querySelector('input[name="air-cond"]:checked');
     const airCond = airCondObj ? airCondObj.value : 'NORMAL';
@@ -360,7 +463,7 @@ window.openSaveLogModal = function() {
             const g=gliders.find(x=>x.id==currentGliderId); 
             flightLogs.unshift({
                 id:Date.now(), d:new Date().toISOString(), m:g.name, w:document.getElementById('res-weight').innerText, 
-                cg:document.getElementById('res-cg').innerText, s:document.getElementById('inp-slope').value.toUpperCase(), 
+                cg:document.getElementById('res-cg').innerText, s:slopeVal, 
                 t:finalTime || null, f:factorVal, cond:airCond, n:n, wind:document.getElementById('inp-wind').value
             }); 
             save(); window.customAlert(t('alert_saved')); 
@@ -458,62 +561,3 @@ window.saveGlider = function() {
 
 window.confirmDeleteGlider = function() { window.showModal(t('msg_del_mod'), false, [{tx:t('cancel'), cl:"btn-outline", val:0}, {tx:t('delete_model'), cl:"btn-danger", val:1}], (r) => { if(r) { gliders = gliders.filter(x=>x.id!==tempGlider.id); save(); window.navigateTo('home'); } }); };
 window.confirmResetLoadout = function() { window.showModal(t('msg_reset'), false, [{tx:t('no'), cl:"btn-outline", val:0}, {tx:t('yes'), cl:"btn-danger", val:1}], (r) => { if(r) { const g = gliders.find(x=>x.id==currentGliderId); g.loadout = g.loadout.map(() => ({b:0, l:0, t:0})); g.noseMass = 0; save(); renderCalc(); } }); };
-// A AJOUTER TOUT EN BAS DE UI.JS
-
-function recalc(g) {
-    if(!g) return;
-    const activeOpts = getActiveOpts(g);
-
-    let nMass = g.noseMass || 0;
-    let nDist = g.noseDist || 0;
-    let m = g.emptyW + nMass;
-    let mom = (g.emptyW * g.emptyCG) + (nMass * (-nDist));
-    let addedMass = nMass; 
-    
-    g.chambers.forEach((c,i) => {
-        const L = g.loadout[i];
-        let mass = L.b*(c.mass_brass||0) + L.l*(c.mass_lead||0) + L.t*(c.mass_tungsten||0);
-        m += mass; mom += mass * c.dist;
-        addedMass += mass;
-    });
-    let cg = mom/m;
-    
-    const wEl = document.getElementById('res-weight');
-    if(wEl) wEl.innerText = (m/1000).toFixed(3);
-    
-    const wVal = parseFloat(document.getElementById('inp-wind').value) || 0;
-    const fVal = parseFloat(document.getElementById('inp-factor').value) || 100;
-    let target = getCalculatedTargetWeight(wVal, fVal, g); 
-    let weightDiff = m - target;
-    if(wEl) wEl.style.color = (weightDiff >= -activeOpts.wMin && weightDiff <= activeOpts.wMax) ? 'var(--success)' : 'var(--warning)';
-
-    const resCgEl = document.getElementById('res-cg');
-    if(resCgEl) resCgEl.innerText = cg.toFixed(1);
-    
-    const diff = cg - g.sessionTargetCG;
-    const dEl = document.getElementById('cg-diff-display'); 
-    if(dEl) {
-        dEl.innerText = (diff*-1 > 0 ? '+' : '') + (diff*-1).toFixed(1) + 'mm';
-        let isCgGood = (diff >= 0) ? (diff <= activeOpts.cgTolPlus) : (Math.abs(diff) <= activeOpts.cgTolMinus);
-        dEl.style.color = isCgGood ? 'var(--success)' : 'var(--danger)';
-        if(resCgEl) resCgEl.style.color = isCgGood ? 'var(--success)' : 'var(--danger)';
-    }
-    
-    const barEl = document.getElementById('bar-weight');
-    if (barEl && barEl.parentNode) { barEl.parentNode.style.display = 'none'; }
-    const loadEl = document.getElementById('res-loading');
-    if(loadEl && g.area > 0) {
-        let load = m/g.area;
-        loadEl.innerText = `${load.toFixed(1)} g/dm² (+${addedMass}g)`;
-        if(load > 75) { loadEl.style.color = 'var(--danger)'; loadEl.style.fontWeight = '900'; loadEl.style.fontSize = '0.9rem'; } else { loadEl.style.color = 'var(--text-muted)'; loadEl.style.fontWeight = 'normal'; loadEl.style.fontSize = '0.75rem'; }
-    }
-    
-    const tgtDisp = document.getElementById('res-target-cg-disp');
-    if(tgtDisp) tgtDisp.innerText = t('cible_short') + " " + g.sessionTargetCG + "mm";
-    
-    const cardTgt = document.getElementById('card-target-cg-disp');
-    if (cardTgt) cardTgt.innerText = g.sessionTargetCG + "mm";
-    
-    const simTgt = document.getElementById('res-sim-target');
-    if(simTgt) simTgt.innerText = (target/1000).toFixed(3);
-}
