@@ -1,83 +1,6 @@
-/* --- DICTIONNAIRE DE TRADUCTION --- */
-const dict = {
-    fr: {
-        new_model: "+ NOUVEAU MODÈLE", logbook_btn: "📓 JOURNAL DES VOLS", back: "RETOUR", config: "CONFIG",
-        settings_title: "PARAMÈTRES", language: "LANGUE", theme: "THÈME", global_calc: "Calcul Global",
-        aero_title: "AÉROLOGIE (DÉCALAGES CG)", lbl_offset_lam: "Laminaire (mm)", lbl_offset_turb: "Turbulent (mm)",
-        opt_title: "OPTIMISATION", opt_desc: "Réglages des limites acceptables pour l'algorithme.",
-        lbl_tol_w_min: "Tol. Poids Moins (-g)", lbl_tol_w_max: "Tol. Poids Plus (+g)",
-        lbl_tol_cg_plus: "Tol. CG + (mm)", lbl_tol_cg_min: "Tol. CG - (mm)",
-        gl_desc: "Définissez la courbe de ballastage pour un planeur standard.",
-        pt1: "POINT 1 (Léger/Vide)", pt2: "POINT 2 (Lourd/Max)", lbl_weight_kg: "Poids (kg)",
-        ref_surf: "Surface Référence (dm²)", res_int: "Résultat interne:",
-        stat_target: "CIBLE", stat_current: "ACTUEL", stat_cg: "CG (mm)", wind: "Vent (m/s)", factor: "Facteur %", optimize: "🪄 OPTIMISER",
-        clear_all: "Tout Vider", ph_slope: "Pente", ph_time: "Chrono", save_flight: "💾 ENREGISTRER",
-        mass_g: "MASSE (g)", adj_cg: "Ajust. CG",
-        edit_title: "ÉDITION DU MODÈLE", lbl_name: "Nom du modèle", lbl_empty_w: "Poids à vide (g)", 
-        lbl_empty_cg: "Centrage à vide (mm)", lbl_area: "Surface Ailaire (dm²)", lbl_target_cg: "Centrage Cible (mm)",
-        desc_nose: "Distance mesurée entre la soute de nez et le Bord d'Attaque.",
-        chambers_title: "CONFIGURATION DES BALLASTS", add_chamber: "+ Ajouter une soute", lbl_color: "Coul.",
-        lbl_ch_name: "Nom Soute", lbl_grp: "Lien", lbl_dist: "Dist. Bord d'Attaque ", lbl_max: "Capacité Max (Qté)", 
-        lbl_unit_mass: "Poids d'un élément (g)", lbl_stock: "Stock Disponible (Qté)", ph_stock: "Stock",
-        save: "SAUVEGARDER", cancel: "ANNULER", delete_model: "SUPPRIMER", duplicate_model: "DUPLIQUER", copy_suffix: " (Copie)", export_model: "EXPORTER MODÈLE",
-        logbook_title: "JOURNAL", help_title: "AIDE", mat_brass: "LAITON", mat_lead: "PLOMB", mat_tung: "TUNG.",
-        alert_saved: "Vol enregistré !", alert_copied: "Copié !", msg_del_log: "Supprimer ce vol ?", msg_del_mod: "Supprimer ce modèle ?", msg_reset: "Vider les ballasts ?",
-        msg_note: "Note du vol :", yes: "OUI", no: "NON", charge: "Charge", cible_short: "Cible",
-        all_models: "TOUS MODÈLES", all_slopes: "TOUTES PENTES", nose_title: "SOUTE NEZ (MANUEL)",
-        data_title: "DONNÉES & SAUVEGARDE", data_desc: "Sauvegardez l'intégralité de vos modèles et vols.",
-        export_all: "EXPORTER TOUT (.json)", import_btn: "IMPORTER",
-        msg_import_success: "Importation réussie !", msg_import_err: "Erreur lors de l'import.",
-        msg_replace_all: "Attention : Ceci va REMPLACER tous vos modèles et logs actuels. Continuer ?",
-        msg_add_model: "Modèle détecté : ", msg_add_model_q: "Voulez-vous l'ajouter à votre liste ?",
-        help_html: `<h3>F3F Manager V6.3</h3><p>Optimisation intelligente, Croquis Dynamique et Ingénieur embarqué.</p>`
-    },
-    en: {
-        new_model: "+ NEW MODEL", logbook_btn: "📓 LOGBOOK", back: "BACK", config: "CONFIG",
-        settings_title: "SETTINGS", language: "LANGUAGE", theme: "THEME", global_calc: "Global Calc",
-        aero_title: "AEROLOGY (CG OFFSETS)", lbl_offset_lam: "Laminar (mm)", lbl_offset_turb: "Turbulent (mm)",
-        opt_title: "OPTIMIZATION", opt_desc: "Algorithm tolerance limits.",
-        lbl_tol_w_min: "Tol. Weight Minus (-g)", lbl_tol_w_max: "Tol. Weight Plus (+g)",
-        lbl_tol_cg_plus: "Tol. CG + (mm)", lbl_tol_cg_min: "Tol. CG - (mm)",
-        gl_desc: "Define the standard glider ballast curve.",
-        pt1: "POINT 1 (Light/Empty)", pt2: "POINT 2 (Heavy/Max)", lbl_weight_kg: "Weight (kg)",
-        ref_surf: "Reference Area (dm²)", res_int: "Internal result:",
-        stat_target: "TARGET", stat_current: "CURRENT", stat_cg: "CG (mm)", wind: "Wind (m/s)", factor: "Factor %", optimize: "🪄 OPTIMIZE",
-        clear_all: "Clear All", ph_slope: "Slope", ph_time: "Time", save_flight: "💾 SAVE FLIGHT",
-        mass_g: "MASS (g)", adj_cg: "Adjust CG",
-        edit_title: "EDIT MODEL", lbl_name: "Model Name", lbl_empty_w: "Empty Weight (g)", 
-        lbl_empty_cg: "Empty CG (mm)", lbl_area: "Wing Area (dm²)", lbl_target_cg: "Target CG (mm)",
-        desc_nose: "Distance measured from Nose Ballast to Leading Edge.",
-        chambers_title: "BALLAST CONFIGURATION", add_chamber: "+ Add Chamber", lbl_color: "Col.",
-        lbl_ch_name: "Chamber Name", lbl_grp: "Link", lbl_dist: "Dist. Leading Edge", lbl_max: "Max Capacity (Qty)", 
-        lbl_unit_mass: "Unit Weight (g)", lbl_stock: "Available Stock (Qty)", ph_stock: "Stock",
-        save: "SAVE", cancel: "CANCEL", delete_model: "DELETE", duplicate_model: "DUPLICATE", copy_suffix: " (Copy)", export_model: "EXPORT MODEL",
-        logbook_title: "LOGBOOK", help_title: "HELP", mat_brass: "BRASS", mat_lead: "LEAD", mat_tung: "TUNG.",
-        alert_saved: "Flight saved!", alert_copied: "Copied!", msg_del_log: "Delete this flight?", msg_del_mod: "Delete this model?", msg_reset: "Clear all ballast?",
-        msg_note: "Flight note:", yes: "YES", no: "NO", charge: "Load", cible_short: "Target",
-        all_models: "ALL MODELS", all_slopes: "ALL SLOPES", nose_title: "NOSE BALLAST (MANUAL)",
-        data_title: "DATA & BACKUP", data_desc: "Backup all your models and flights.",
-        export_all: "EXPORT ALL (.json)", import_btn: "IMPORT",
-        msg_import_success: "Import successful!", msg_import_err: "Error during import.",
-        msg_replace_all: "Warning: This will REPLACE all your current models and logs. Continue?",
-        msg_add_model: "Model detected: ", msg_add_model_q: "Add it to your list?",
-        help_html: `<h3>F3F Manager V6.3</h3><p>Smart optimization, Dynamic Sketch and Embedded Track Engineer.</p>`
-    }
-};
-
-/* --- VARIABLES D'ÉTAT & GESTION LANGUE --- */
-let gliders = [], flightLogs = [], globalCoefs = {}, optParams = {};
-let currentGliderId = null, tempGlider = null;
-let settingsChartInstance = null;
-
-const phoneLang = (navigator.language || navigator.userLanguage).substring(0, 2);
-const defaultLang = dict[phoneLang] ? phoneLang : 'en';
-let currentLang = localStorage.getItem('f3f_lang') || defaultLang;
-
-let currentTheme = localStorage.getItem('f3f_theme_style') || 'cyber';
-let geminiApiKey = localStorage.getItem('f3f_gemini_key') || '';
-
-/* --- FONCTION BOUCLIER (Protège contre les NaN et champs vides) --- */
-const getNum = (val, fallback) => { const v = parseFloat(val); return isNaN(v) ? fallback : v; };
+// ==========================================
+// APP.JS : INTERFACE (UI), API ET INITIALISATION
+// ==========================================
 
 /* --- VERIFICATION MISES A JOUR --- */
 async function checkForUpdates() {
@@ -107,84 +30,6 @@ function hexToRgba(hex, alpha) {
         return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+alpha+')';
     }
     return 'rgba(255,255,255,0.05)';
-}
-
-function calculateAB() {
-    let x1 = getNum(globalCoefs.v1, 3), y1 = getNum(globalCoefs.m1, 2.3); 
-    let x2 = getNum(globalCoefs.v2, 20), y2 = getNum(globalCoefs.m2, 5.0);
-    let xp = getNum(globalCoefs.vp, 10), yp = getNum(globalCoefs.mp, 3.5);
-    
-    if (x2 === x1) x2 += 0.1; 
-    
-    if (globalCoefs.isDouble) {
-        if (xp === x1) xp += 0.1;
-        if (x2 === xp) x2 += 0.1;
-        globalCoefs.a = (yp - y1) / (xp - x1);
-        globalCoefs.b = y1 - (globalCoefs.a * x1);
-        globalCoefs.a2 = (y2 - yp) / (x2 - xp);
-        globalCoefs.b2 = yp - (globalCoefs.a2 * xp);
-    } else {
-        globalCoefs.a = (y2 - y1) / (x2 - x1);
-        globalCoefs.b = y1 - (globalCoefs.a * x1);
-    }
-
-    const elA = document.getElementById('disp-coef-a');
-    const elB = document.getElementById('disp-coef-b');
-    if(elA) elA.innerText = globalCoefs.a.toFixed(3) + (globalCoefs.isDouble ? " / " + globalCoefs.a2.toFixed(3) : "");
-    if(elB) elB.innerText = globalCoefs.b.toFixed(3) + (globalCoefs.isDouble ? " / " + globalCoefs.b2.toFixed(3) : "");
-}
-
-function getActiveCoefs(g) {
-    if(g && g.useCustomSettings) {
-        return { 
-            a: g.cA !== undefined ? g.cA : globalCoefs.a, 
-            b: g.cB !== undefined ? g.cB : globalCoefs.b, 
-            a2: g.cA2 !== undefined ? g.cA2 : globalCoefs.a2, 
-            b2: g.cB2 !== undefined ? g.cB2 : globalCoefs.b2, 
-            vp: g.cVp !== undefined ? g.cVp : globalCoefs.vp,
-            isDouble: g.cIsDouble || false,
-            refArea: globalCoefs.refArea 
-        };
-    }
-    return globalCoefs; 
-}
-
-function getActiveOpts(g) {
-    if(g && g.useCustomSettings) {
-        return { 
-            wMin: getNum(g.customTolWMin, optParams.wMin), 
-            wMax: getNum(g.customTolWMax, optParams.wMax), 
-            cgTolPlus: getNum(g.customTolCgPlus, optParams.cgTolPlus), 
-            cgTolMinus: getNum(g.customTolCgMinus, optParams.cgTolMinus) 
-        };
-    }
-    return optParams;
-}
-
-function getCalculatedTargetWeight(w, f, g) {
-    if (isNaN(w) || isNaN(f) || !g) return 0;
-    const active = getActiveCoefs(g);
-    let baseTarget = 0;
-
-    if (active.isDouble && w > (active.vp || 10)) {
-        baseTarget = (active.a2 * w + active.b2) * 1000;
-    } else {
-        baseTarget = (active.a * w + active.b) * 1000;
-    }
-
-    let ratio = (g.area && g.area > 0 && active.refArea > 0) ? g.area / active.refArea : 1;
-    return baseTarget * ratio * (f/100);
-}
-
-function getEffectiveStock(g, idx, typeFull) {
-    const c = g.chambers[idx];
-    const stockKey = 'stock_' + typeFull;
-    if(c.group && c.group > 0) {
-        let totalGroupStock = 0;
-        g.chambers.forEach(ch => { if(ch.group == c.group) { totalGroupStock += (parseFloat(ch[stockKey]) || 0); } });
-        return { val: totalGroupStock, isGroup: true };
-    }
-    return { val: (parseFloat(c[stockKey]) || 0), isGroup: false };
 }
 
 /* --- AFFICHAGE & NAVIGATION --- */
@@ -644,184 +489,6 @@ window.suggestFromHistory = function() {
     `;
 };
 
-window.autoFillBallast = function() {
-    document.getElementById('ai-suggestion-box').classList.add('hidden'); 
-    const g = gliders.find(x => x.id == currentGliderId); if(!g) return;
-    const activeOpts = getActiveOpts(g); 
-
-    const wVal = parseFloat(document.getElementById('inp-wind').value) || 0;
-    const fVal = parseFloat(document.getElementById('inp-factor').value) || 100;
-    let targetW = getCalculatedTargetWeight(wVal, fVal, g);
-    if(targetW <= 0) return;
-
-    const matMap = { 'brass': 'b', 'lead': 'l', 'tungsten': 't' };
-    let baseM = g.emptyW + (g.noseMass || 0);
-    let baseMom = (g.emptyW * g.emptyCG) + ((g.noseMass || 0) * -(g.noseDist || 0));
-    let indices = g.chambers.map((_, idx) => idx);
-
-    function getStats(load) {
-        let m = baseM, mom = baseMom;
-        g.chambers.forEach((c,i) => {
-            let w = load[i].b*(c.mass_brass||0) + load[i].l*(c.mass_lead||0) + load[i].t*(c.mass_tungsten||0);
-            m += w; mom += w * c.dist;
-        });
-        return { m, cg: (m > 0 ? mom/m : 0) };
-    }
-
-    function getCost(stats) {
-        let diffW = stats.m - targetW;
-        let diffCG = stats.cg - g.sessionTargetCG;
-        
-        let wCost = 0;
-        if (diffW > activeOpts.wMax) wCost = (diffW - activeOpts.wMax) * 50.0;
-        else if (diffW < -activeOpts.wMin) wCost = Math.abs(diffW + activeOpts.wMin) * 50.0;
-        else wCost = Math.abs(diffW) * 0.1;
-        
-        let cgCost = 0;
-        if (diffCG > 0) { 
-            if(diffCG > activeOpts.cgTolPlus) cgCost = (diffCG - activeOpts.cgTolPlus) * 10000.0; 
-            else cgCost = diffCG * 15.0; 
-        } else { 
-            if(Math.abs(diffCG) > activeOpts.cgTolMinus) cgCost = (Math.abs(diffCG) - activeOpts.cgTolMinus) * 10000.0; 
-            else cgCost = Math.abs(diffCG) * 15.0; 
-        }
-        return wCost + cgCost;
-    }
-
-    const getGroupUsage = (grpId, matCode, load) => { let u = 0; g.chambers.forEach((ch, idx) => { if(ch.group == grpId) u += load[idx][matCode]; }); return u; };
-
-    let bestGlobalLoadout = g.loadout.map(() => ({b:0, l:0, t:0}));
-    let bestGlobalScore = Infinity;
-
-    for (let attempt = 0; attempt < 15; attempt++) {
-        let currentLoadout = g.chambers.map(() => ({b:0, l:0, t:0}));
-
-        if (attempt > 0) {
-            g.chambers.forEach((c, i) => {
-                let numToAdd = Math.floor(Math.random() * (c.max + 1));
-                for(let k=0; k<numToAdd; k++) {
-                    let availableMats = [];
-                    ['brass', 'lead', 'tungsten'].forEach(mat => {
-                        let mCode = matMap[mat];
-                        let eff = getEffectiveStock(g, i, mat);
-                        let currentUsage = eff.isGroup ? getGroupUsage(c.group, mCode, currentLoadout) : currentLoadout[i][mCode];
-                        if (currentUsage < eff.val) availableMats.push(mCode);
-                    });
-                    if (availableMats.length > 0) {
-                        let m = availableMats[Math.floor(Math.random() * availableMats.length)];
-                        currentLoadout[i][m]++;
-                    }
-                }
-            });
-        }
-
-        let currentScore = getCost(getStats(currentLoadout));
-        let improved = true;
-        let steps = 0;
-
-        while (improved && steps < 500) {
-            improved = false;
-            let bestMove = null;
-            let bestMoveScore = currentScore;
-
-            indices.forEach((i) => { 
-                let c = g.chambers[i];
-                let L = currentLoadout[i];
-                
-                if((L.b + L.l + L.t) < c.max) {
-                    ['brass', 'lead', 'tungsten'].forEach(mat => {
-                        let mCode = matMap[mat];
-                        let eff = getEffectiveStock(g, i, mat); 
-                        let canAdd = false;
-                        
-                        if(eff.val > 0) {
-                            if(eff.isGroup) { if(getGroupUsage(c.group, mCode, currentLoadout) < eff.val) canAdd = true; } 
-                            else { if(L[mCode] < eff.val) canAdd = true; }
-                        }
-
-                        if(canAdd) {
-                            let testLoad = JSON.parse(JSON.stringify(currentLoadout)); testLoad[i][mCode]++;
-                            let h = getCost(getStats(testLoad));
-                            if(mat==='lead') h -= 0.001; if(mat==='tungsten') h -= 0.002;
-                            if(h < bestMoveScore) { bestMoveScore = h; bestMove = {action:'add', i, mat: mCode}; }
-                        }
-                    });
-                }
-
-                ['brass', 'lead', 'tungsten'].forEach(mat => {
-                    let mCode = matMap[mat];
-                    if(L[mCode] > 0) {
-                        let testLoad = JSON.parse(JSON.stringify(currentLoadout)); testLoad[i][mCode]--;
-                        let h = getCost(getStats(testLoad));
-                        if(h < bestMoveScore) { bestMoveScore = h; bestMove = {action:'sub', i, mat: mCode}; }
-                    }
-                });
-            });
-            
-            if (bestMove) {
-                if (bestMove.action === 'add') currentLoadout[bestMove.i][bestMove.mat]++;
-                if (bestMove.action === 'sub') currentLoadout[bestMove.i][bestMove.mat]--;
-                currentScore = bestMoveScore;
-                improved = true;
-            }
-            steps++;
-        }
-
-        if (currentScore < bestGlobalScore) {
-            bestGlobalScore = currentScore;
-            bestGlobalLoadout = JSON.parse(JSON.stringify(currentLoadout));
-        }
-    }
-    g.loadout = bestGlobalLoadout; 
-    save(); 
-    renderCalc();
-};
-
-/* --- DATA & IMPORT/EXPORT --- */
-window.exportData = function(type) {
-    let exportObj = {}, fileName = "f3f_backup.json";
-    if(type === 'all') {
-        exportObj = { type: 'backup_full', version: '6.3', date: new Date().toISOString(), gliders: gliders, logs: flightLogs, coefs: globalCoefs, opts: optParams };
-        fileName = `f3f_full_backup_${new Date().toISOString().slice(0,10)}.json`;
-    } else if (type === 'model') {
-        if(!tempGlider) return;
-        exportObj = { type: 'backup_model', version: '6.3', data: tempGlider };
-        fileName = `${tempGlider.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
-    }
-    const blob = new Blob([JSON.stringify(exportObj, null, 2)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = fileName;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-};
-
-window.triggerImport = function() { document.getElementById('import-file').click(); };
-document.getElementById('import-file').addEventListener('change', function() {
-    const file = this.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const json = JSON.parse(e.target.result);
-            processImport(json);
-        } catch(err) { window.customAlert(t('msg_import_err')); console.error(err); }
-        this.value = '';
-    };
-    reader.readAsText(file);
-});
-
-function processImport(data) {
-    if(!data.type) { window.customAlert(t('msg_import_err')); return; }
-    if(data.type === 'backup_full') {
-        window.showModal(t('msg_replace_all'), false, [{tx:t('cancel'), cl:'btn-outline', val:0}, {tx:t('yes'), cl:'btn-danger', val:1}], (r) => {
-            if(r) { gliders = data.gliders || []; flightLogs = data.logs || []; globalCoefs = data.coefs || globalCoefs; optParams = data.opts || optParams; save(); window.location.reload(); }
-        });
-    } else if (data.type === 'backup_model') {
-        let m = data.data;
-        window.showModal(t('msg_add_model') + m.name + ". " + t('msg_add_model_q'), false, [{tx:t('cancel'), cl:'btn-outline', val:0}, {tx:t('yes'), cl:'btn-success', val:1}], (r) => {
-            if(r) { m.id = Date.now(); m.loadout = m.chambers.map(() => ({b:0, l:0, t:0})); gliders.push(m); save(); window.customAlert(t('msg_import_success')); window.navigateTo('home'); }
-        });
-    } else { window.customAlert(t('msg_import_err')); }
-}
-
 /* --- LOGS --- */
 function updateLogFilters() {
     const mSel = document.getElementById('filter-model'), sSel = document.getElementById('filter-slope');
@@ -933,7 +600,24 @@ window.generateAiReport = async function() {
 window.toggleLocalSettings = function() { const isCustom = document.getElementById('edit-use-custom').checked; document.getElementById('local-settings-panel').classList.toggle('hidden', !isCustom); };
 window.toggleEditBilinear = function() { const isDouble = document.getElementById('edit-check-bilinear').checked; document.getElementById('edit-block-pivot').classList.toggle('hidden', !isDouble); };
 
-window.createNewGlider = function() { tempGlider = { id: Date.now(), name: "MODÈLE", emptyW: 2200, emptyCG: 100, area: 58, target: 102, chambers: [{ name: "AILES", dist: 100, mass_brass: 150, mass_lead: 200, mass_tungsten: 300, max: 10, color: "#888888" }], loadout: [{b:0,l:0,t:0}], noseDist: 0, noseMass: 0, noseColor: "#d63384", useCustomSettings: false }; renderEdit(); window.navigateTo('edit'); };
+window.createNewGlider = function() { 
+    tempGlider = { 
+        id: Date.now(), 
+        name: "MODÈLE", 
+        emptyW: 2200, 
+        emptyCG: 100, 
+        area: 58, 
+        target: 102, 
+        chambers: [{ name: "AILES", dist: 100, mass_brass: 150, mass_lead: 200, mass_tungsten: 300, max: 10, color: "#888888" }], 
+        loadout: [{b:0,l:0,t:0}], 
+        noseDist: 0, 
+        noseMass: 0, 
+        noseColor: "#d63384", 
+        useCustomSettings: false 
+    }; 
+    renderEdit(); 
+    window.navigateTo('edit'); 
+};
 window.editCurrentGlider = function() { const g = gliders.find(x => x.id == currentGliderId); if(!g) return; tempGlider = JSON.parse(JSON.stringify(g)); renderEdit(); window.navigateTo('edit'); };
 
 function renderEdit() { 
@@ -1087,9 +771,7 @@ window.saveGlider = function() {
 window.confirmDeleteGlider = function() { window.showModal(t('msg_del_mod'), false, [{tx:t('cancel'), cl:"btn-outline", val:0}, {tx:t('delete_model'), cl:"btn-danger", val:1}], (r) => { if(r) { gliders = gliders.filter(x=>x.id!==tempGlider.id); save(); window.navigateTo('home'); } }); };
 window.confirmResetLoadout = function() { window.showModal(t('msg_reset'), false, [{tx:t('no'), cl:"btn-outline", val:0}, {tx:t('yes'), cl:"btn-danger", val:1}], (r) => { if(r) { const g = gliders.find(x=>x.id==currentGliderId); g.loadout = g.loadout.map(() => ({b:0, l:0, t:0})); g.noseMass = 0; save(); renderCalc(); } }); };
 
-/* --- SAVE & INIT --- */
-function save() { localStorage.setItem('f3f_gliders', JSON.stringify(gliders)); localStorage.setItem('f3f_logs', JSON.stringify(flightLogs)); localStorage.setItem('f3f_global_coefs', JSON.stringify(globalCoefs)); localStorage.setItem('f3f_opt_params', JSON.stringify(optParams)); }
-
+/* --- SAVE SETTINGS GLOBALS & INIT --- */
 window.saveGlobalCoefs = function() { 
     globalCoefs.v1 = getNum(document.getElementById('set-v1').value, 3); 
     globalCoefs.m1 = getNum(document.getElementById('set-m1').value, 2.3); 
@@ -1113,8 +795,7 @@ window.saveOptParams = function() {
 };
 
 function initApp() {
-    // 1. Models
-    gliders = JSON.parse(localStorage.getItem('f3f_gliders')) || [];
+    gliders = safeParse('f3f_gliders', []);
     if (gliders.length === 0) {
         gliders = [
             { id: 1, name: "FREESTYLER (Ancien)", emptyW: 2100, emptyCG: 100, area: 60, target: 100, noseDist: 250, noseMass: 0, noseColor: "#d63384", useCustomSettings: false, chambers: [ { name: "CLÉ", dist: 0, max: 4, mass_brass: 150, mass_lead: 200, mass_tungsten: 300, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" }, { name: "AILES", dist: 40, max: 6, mass_brass: 100, mass_lead: 150, mass_tungsten: 200, stock_brass: 0, stock_lead: 0, stock_tungsten: 6, color: "#0ea5e9" } ], loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}] },
@@ -1124,11 +805,9 @@ function initApp() {
         localStorage.setItem('f3f_gliders', JSON.stringify(gliders));
     }
     
-    // 2. Logs
-    flightLogs = JSON.parse(localStorage.getItem('f3f_logs')) || [];
+    flightLogs = safeParse('f3f_logs', []);
     
-    // 3. Global Coefs (Sécurité Anti-NaN)
-    let savedCoefs = JSON.parse(localStorage.getItem('f3f_global_coefs')) || {};
+    let savedCoefs = safeParse('f3f_global_coefs', {});
     globalCoefs = {
         a: getNum(savedCoefs.a, 0.16), b: getNum(savedCoefs.b, 1.82), a2: getNum(savedCoefs.a2, 0), b2: getNum(savedCoefs.b2, 0),
         refArea: getNum(savedCoefs.refArea, 62),
@@ -1138,16 +817,15 @@ function initApp() {
         isDouble: savedCoefs.isDouble === true
     };
     
-    // 4. Opt Params (Sécurité Anti-NaN)
-    let savedOpt = JSON.parse(localStorage.getItem('f3f_opt_params')) || {};
+    let savedOpt = safeParse('f3f_opt_params', {});
     optParams = {
         wMin: getNum(savedOpt.wMin, 75), wMax: getNum(savedOpt.wMax, 20),
         cgTolPlus: getNum(savedOpt.cgTolPlus, 0.5), cgTolMinus: getNum(savedOpt.cgTolMinus, 0.5),
         cgOffsetLam: getNum(savedOpt.cgOffsetLam, 0.5), cgOffsetTurb: getNum(savedOpt.cgOffsetTurb, -1.0)
     };
-    save(); // Force la sauvegarde propre
+    
+    save(); 
 
-    // 5. Remplissage du DOM global
     let setV1 = document.getElementById('set-v1');
     if (setV1) {
         document.getElementById('set-v1').value = globalCoefs.v1; document.getElementById('set-m1').value = globalCoefs.m1;
@@ -1170,9 +848,9 @@ function initApp() {
     let lSel = document.getElementById('lang-select'); if(lSel) lSel.value = currentLang;
     let tSel = document.getElementById('theme-select'); if(tSel) tSel.value = currentTheme; 
     
-    updateUITexts(); showView('home');
+    updateUITexts(); 
+    showView('home');
 
-    // Lance le test de version après 1.5s
     setTimeout(checkForUpdates, 1500);
 }
 
