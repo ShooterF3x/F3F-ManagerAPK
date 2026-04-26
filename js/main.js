@@ -11,7 +11,8 @@ window.saveGlobalCoefs = function() {
     globalCoefs.mp = getNum(document.getElementById('set-m-pivot').value, 3.5); 
     globalCoefs.isDouble = document.getElementById('check-bilinear').checked;
     globalCoefs.refArea = getNum(document.getElementById('set-ref-area').value, 62); 
-    calculateAB(); save(); 
+    if(window.calculateAB) calculateAB(); 
+    save(); 
 };
 
 window.saveOptParams = function() { 
@@ -25,18 +26,21 @@ window.saveOptParams = function() {
 };
 
 function initApp() {
+    // 1. Initialisation des modèles
     gliders = safeParse('f3f_gliders', []);
     if (gliders.length === 0) {
         gliders = [
             { id: 1, name: "FREESTYLER (Ancien)", emptyW: 2100, emptyCG: 100, area: 60, target: 100, noseDist: 250, noseMass: 0, noseColor: "#d63384", useCustomSettings: false, chambers: [ { name: "CLÉ", dist: 0, max: 4, mass_brass: 150, mass_lead: 200, mass_tungsten: 300, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" }, { name: "AILES", dist: 40, max: 6, mass_brass: 100, mass_lead: 150, mass_tungsten: 200, stock_brass: 0, stock_lead: 0, stock_tungsten: 6, color: "#0ea5e9" } ], loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}] },
-            { id: 2, name: "JAZZ", emptyW: 2350, emptyCG: 98, area: 58, target: 98, noseDist: 280, noseMass: 0, noseColor: "#d63384", useCustomSettings: false, chambers: [ { name: "MENUISERIE", dist: 10, max: 4, mass_brass: 120, mass_lead: 180, mass_tungsten: 250, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" }, { name: "SAUMONS", dist: 60, max: 4, mass_brass: 90, mass_lead: 140, mass_tungsten: 190, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#f59e0b" } ], loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}] },
-            { id: 3, name: "PIKE", emptyW: 2280, emptyCG: 99, area: 61, target: 99, noseDist: 260, noseMass: 0, noseColor: "#d63384", useCustomSettings: false, chambers: [ { name: "BALLASTS", dist: 0, max: 8, mass_brass: 140, mass_lead: 210, mass_tungsten: 290, stock_brass: 0, stock_lead: 0, stock_tungsten: 8, color: "#888888" } ], loadout: [{b:0,l:0,t:0}] }
+            { id: 2, name: "JAZZ", emptyW: 2350, emptyCG: 98, area: 58, target: 98, noseDist: 280, noseMass: 0, noseColor: "#d63384", useCustomSettings: false, chambers: [ { name: "MENUISERIE", dist: 10, max: 4, mass_brass: 120, mass_lead: 180, mass_tungsten: 250, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" }, { name: "SAUMONS", dist: 60, max: 4, mass_brass: 90, mass_lead: 140, mass_tungsten: 190, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#f59e0b" } ], loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}] }
         ];
         localStorage.setItem('f3f_gliders', JSON.stringify(gliders));
     }
     
+    // 2. Chargement Logs et Pentes
     flightLogs = safeParse('f3f_logs', []);
+    savedSlopes = safeParse('f3f_slopes', []);
     
+    // 3. Chargement Config globale
     let savedCoefs = safeParse('f3f_global_coefs', {});
     globalCoefs = {
         a: getNum(savedCoefs.a, 0.16), b: getNum(savedCoefs.b, 1.82), a2: getNum(savedCoefs.a2, 0), b2: getNum(savedCoefs.b2, 0),
@@ -56,6 +60,7 @@ function initApp() {
     
     save(); 
 
+    // 4. Remplissage UI Config
     let setV1 = document.getElementById('set-v1');
     if (setV1) {
         document.getElementById('set-v1').value = globalCoefs.v1; document.getElementById('set-m1').value = globalCoefs.m1;
@@ -64,26 +69,28 @@ function initApp() {
         document.getElementById('check-bilinear').checked = globalCoefs.isDouble;
         document.getElementById('block-pivot').classList.toggle('hidden', !globalCoefs.isDouble);
 
-        calculateAB();
+        if(window.calculateAB) calculateAB();
         document.getElementById('set-ref-area').value = globalCoefs.refArea;
         document.getElementById('set-tol-w-min').value = optParams.wMin; document.getElementById('set-tol-w-max').value = optParams.wMax;
         document.getElementById('set-tol-cg-plus').value = optParams.cgTolPlus; document.getElementById('set-tol-cg-minus').value = optParams.cgTolMinus;
         document.getElementById('set-offset-lam').value = optParams.cgOffsetLam; document.getElementById('set-offset-turb').value = optParams.cgOffsetTurb;
     }
     
-    window.setTheme(currentTheme);
+    // 5. Finalisation affichage
+    if(window.setTheme) window.setTheme(currentTheme);
     gliders.forEach(g => { if(Array.isArray(g.loadout) && typeof g.loadout[0] === 'number') g.loadout = g.loadout.map(v => ({ b: v, l: 0, t: 0 })); });
     save();
     
     let lSel = document.getElementById('lang-select'); if(lSel) lSel.value = currentLang;
     let tSel = document.getElementById('theme-select'); if(tSel) tSel.value = currentTheme; 
     
-    updateUITexts(); 
-    showView('home');
+    if(window.updateUITexts) window.updateUITexts(); 
+    if(window.renderSlopeDropdown) window.renderSlopeDropdown();
+    if(window.showView) window.showView('home');
 
-    // Lance le test de version sur GitHub après 1.5s
-    setTimeout(checkForUpdates, 1500);
+    // 6. Vérification de version sur le github après 1.5 secondes
+    setTimeout(() => { if(window.checkForUpdates) checkForUpdates(); }, 1500);
 }
 
-// Le grand démarrage quand la page web est chargée :
+// Lancement au chargement de la page
 window.addEventListener('load', initApp);
