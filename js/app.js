@@ -169,7 +169,7 @@ function updateUITexts() {
 // (saveApiKey, generateAiReport...)
 
 // ==========================================
-// 9. INITIALISATION
+// 9. INITIALISATION & SAUVEGARDE
 // ==========================================
 function save() { 
     localStorage.setItem('f3f_gliders', JSON.stringify(gliders)); 
@@ -178,15 +178,121 @@ function save() {
     localStorage.setItem('f3f_opt_params', JSON.stringify(optParams)); 
 }
 
+window.saveGlobalCoefs = function() { 
+    globalCoefs.v1 = parseFloat(document.getElementById('set-v1').value) || 0; 
+    globalCoefs.m1 = parseFloat(document.getElementById('set-m1').value) || 0; 
+    globalCoefs.v2 = parseFloat(document.getElementById('set-v2').value) || 20; 
+    globalCoefs.m2 = parseFloat(document.getElementById('set-m2').value) || 5; 
+    globalCoefs.vp = parseFloat(document.getElementById('set-v-pivot').value) || 10; 
+    globalCoefs.mp = parseFloat(document.getElementById('set-m-pivot').value) || 3.5; 
+    globalCoefs.isDouble = document.getElementById('check-bilinear').checked;
+    globalCoefs.refArea = parseFloat(document.getElementById('set-ref-area').value); 
+    calculateAB(); save(); 
+};
+
+window.saveOptParams = function() { 
+    optParams.wMin = parseFloat(document.getElementById('set-tol-w-min').value) || 0; 
+    optParams.wMax = parseFloat(document.getElementById('set-tol-w-max').value) || 0; 
+    optParams.cgTolPlus = parseFloat(document.getElementById('set-tol-cg-plus').value) || 0.1; 
+    optParams.cgTolMinus = parseFloat(document.getElementById('set-tol-cg-minus').value) || 0.1; 
+    optParams.cgOffsetLam = parseFloat(document.getElementById('set-offset-lam').value) || 0;
+    optParams.cgOffsetTurb = parseFloat(document.getElementById('set-offset-turb').value) || 0;
+    save(); 
+};
+
 function initApp() {
-    // (Ta logique de chargement existante ici...)
+    // 1. Chargement de la flotte ou Valeurs par défaut
     gliders = JSON.parse(localStorage.getItem('f3f_gliders')) || [];
-    // ...
+    if (gliders.length === 0) {
+        gliders = [
+            {
+                id: 1, name: "FREESTYLER (Ancien)", emptyW: 2100, emptyCG: 100, area: 60, target: 100, noseDist: 250, noseMass: 0, noseColor: "#d63384", useCustomSettings: false,
+                chambers: [
+                    { name: "CLÉ", dist: 0, max: 4, mass_brass: 150, mass_lead: 200, mass_tungsten: 300, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" },
+                    { name: "AILES", dist: 40, max: 6, mass_brass: 100, mass_lead: 150, mass_tungsten: 200, stock_brass: 0, stock_lead: 0, stock_tungsten: 6, color: "#0ea5e9" }
+                ],
+                loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}]
+            },
+            {
+                id: 2, name: "JAZZ", emptyW: 2350, emptyCG: 98, area: 58, target: 98, noseDist: 280, noseMass: 0, noseColor: "#d63384", useCustomSettings: false,
+                chambers: [
+                    { name: "MENUISERIE", dist: 10, max: 4, mass_brass: 120, mass_lead: 180, mass_tungsten: 250, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#888888" },
+                    { name: "SAUMONS", dist: 60, max: 4, mass_brass: 90, mass_lead: 140, mass_tungsten: 190, stock_brass: 0, stock_lead: 0, stock_tungsten: 4, color: "#f59e0b" }
+                ],
+                loadout: [{b:0,l:0,t:0}, {b:0,l:0,t:0}]
+            },
+            {
+                id: 3, name: "PIKE", emptyW: 2280, emptyCG: 99, area: 61, target: 99, noseDist: 260, noseMass: 0, noseColor: "#d63384", useCustomSettings: false,
+                chambers: [
+                    { name: "BALLASTS", dist: 0, max: 8, mass_brass: 140, mass_lead: 210, mass_tungsten: 290, stock_brass: 0, stock_lead: 0, stock_tungsten: 8, color: "#888888" }
+                ],
+                loadout: [{b:0,l:0,t:0}]
+            }
+        ];
+        localStorage.setItem('f3f_gliders', JSON.stringify(gliders));
+    }
+
+    // 2. Chargement des logs
+    flightLogs = JSON.parse(localStorage.getItem('f3f_logs')) || [];
+
+    // 3. Chargement des coefficients globaux
+    let savedCoefs = JSON.parse(localStorage.getItem('f3f_global_coefs'));
+    if (!savedCoefs) { 
+        globalCoefs = { a: 0.16, b: 1.82, refArea: 62, v1:3, m1:2.3, v2:20, m2:5.0, isDouble: false, vp: 10, mp: 3.5, a2: 0, b2: 0 }; 
+        save(); 
+    } else { 
+        globalCoefs = savedCoefs; 
+        if(!globalCoefs.refArea) globalCoefs.refArea = 62; 
+        if(globalCoefs.isDouble === undefined) globalCoefs.isDouble = false;
+    }
+
+    // 4. Chargement des paramètres d'optimisation
+    let savedOpt = JSON.parse(localStorage.getItem('f3f_opt_params'));
+    if(savedOpt) optParams = savedOpt;
+    if(optParams.cgOffsetLam === undefined) optParams.cgOffsetLam = 0.5;
+    if(optParams.cgOffsetTurb === undefined) optParams.cgOffsetTurb = -1.0;
+
+    // 5. Initialisation du DOM avec les valeurs (ce qui manquait et faisait planter le thème)
+    document.getElementById('set-v1').value = globalCoefs.v1; 
+    document.getElementById('set-m1').value = globalCoefs.m1;
+    document.getElementById('set-v2').value = globalCoefs.v2; 
+    document.getElementById('set-m2').value = globalCoefs.m2;
+    document.getElementById('set-v-pivot').value = globalCoefs.vp || 10; 
+    document.getElementById('set-m-pivot').value = globalCoefs.mp || 3.5;
+    document.getElementById('check-bilinear').checked = globalCoefs.isDouble;
     
+    let blockPivot = document.getElementById('block-pivot');
+    if(blockPivot) blockPivot.classList.toggle('hidden', !globalCoefs.isDouble);
+
+    calculateAB();
+    document.getElementById('set-ref-area').value = globalCoefs.refArea || 62;
+    document.getElementById('set-tol-w-min').value = optParams.wMin; 
+    document.getElementById('set-tol-w-max').value = optParams.wMax;
+    document.getElementById('set-tol-cg-plus').value = optParams.cgTolPlus; 
+    document.getElementById('set-tol-cg-minus').value = optParams.cgTolMinus;
+    document.getElementById('set-offset-lam').value = optParams.cgOffsetLam;
+    document.getElementById('set-offset-turb').value = optParams.cgOffsetTurb;
+
+    // 6. Application stricte du Thème et de la Langue
+    window.setTheme(currentTheme);
+    let langSelect = document.getElementById('lang-select');
+    let themeSelect = document.getElementById('theme-select');
+    if(langSelect) langSelect.value = currentLang; 
+    if(themeSelect) themeSelect.value = currentTheme; 
+
+    // 7. Migration de compatibilité des anciens loadouts
+    gliders.forEach(g => { 
+        if(Array.isArray(g.loadout) && typeof g.loadout[0] === 'number') {
+            g.loadout = g.loadout.map(v => ({ b: v, l: 0, t: 0 })); 
+        }
+    });
+    save();
+
+    // 8. Rendu final
     updateUITexts(); 
     showView('home');
 
-    // Déclenchement de la vérification de mise à jour au lancement
+    // 9. Vérification des mises à jour après un délai (pour ne pas bloquer l'affichage)
     setTimeout(checkForUpdates, 1500);
 }
 
